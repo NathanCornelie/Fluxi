@@ -1,0 +1,41 @@
+spring:
+  # Configuration pour les tests avec Testcontainers
+  datasource:
+    # Les paramètres seront définis par @Testcontainers dans les tests
+    # ou on peut utiliser H2 en mémoire pour les tests unitaires rapides
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  # Configuration JPA pour les tests
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # Recrée le schéma à chaque test
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+        show_sql: false
+  
+  # Configuration Flyway pour tests
+  flyway:
+    enabled: false  # Désactivé si on utilise create-drop
+
+# Logging minimal pour les tests
+logging:
+  level:
+    com.fluxi.backend: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.testcontainers: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+
+# Configuration RabbitMQ pour tests (sera mockée)
+spring:
+  rabbitmq:
+    # Configuration sera surchargée par @TestConfiguration si nécessaire
+    host: localhost
+
+# Configuration pour l'environnement de test

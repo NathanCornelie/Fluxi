@@ -1,0 +1,73 @@
+spring:
+  # Configuration datasource pour production avec variables d'environnement
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/fluxi_prod}
+    username: ${SPRING_DATASOURCE_USERNAME:fluxi}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:50}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      leak-detection-threshold: ${DB_LEAK_DETECTION:60000}
+  
+  # Configuration JPA pour production
+  jpa:
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+        jdbc:
+          batch_size: ${HIBERNATE_BATCH_SIZE:50}
+  
+  # Configuration Flyway pour production
+  flyway:
+    clean-disabled: true  # Protection contre les suppressions accidentelles
+    validate-on-migrate: true
+    out-of-order: false
+  
+  # Configuration RabbitMQ
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: ${RABBITMQ_VHOST:/}
+
+# Logging pour production
+logging:
+  level:
+    com.fluxi.backend: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.springframework.security: WARN
+    com.zaxxer.hikari: WARN
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE_PATH:/var/log/fluxi/fluxi-backend.log}
+
+# Configuration des endpoints de monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,flyway,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never  # Sécurité : ne pas exposer les détails en prod
+  metrics:
+    export:
+      prometheus:
+        enabled: ${METRICS_PROMETHEUS_ENABLED:false}
+
+# Configuration de sécurité supplémentaire
+server:
+  error:
+    include-stacktrace: never  # Ne jamais exposer les stack traces
+    include-message: never
+
+# Configuration pour l'environnement de production

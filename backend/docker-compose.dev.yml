@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL pour développement
+  postgres:
+    image: postgres:15
+    container_name: fluxi-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fluxi_dev
+      POSTGRES_USER: fluxi
+      POSTGRES_PASSWORD: fluxi
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=C
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fluxi -d fluxi_dev"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - fluxi-network
+
+  # PgAdmin pour interface web de gestion PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fluxi-pgadmin-dev
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: dev@fluxi.com
+      PGADMIN_DEFAULT_PASSWORD: fluxi123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fluxi-network
+
+  # RabbitMQ pour la gestion des queues de jobs
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: fluxi-rabbitmq-dev
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: fluxi
+      RABBITMQ_DEFAULT_PASS: fluxi
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - fluxi-network
+
+  # Redis pour le cache (optionnel pour futures features)
+  redis:
+    image: redis:7.2-alpine
+    container_name: fluxi-redis-dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass fluxi
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - fluxi-network
+
+# Volumes persistants
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# Réseau pour l'isolation des services
+networks:
+  fluxi-network:
+    driver: bridge

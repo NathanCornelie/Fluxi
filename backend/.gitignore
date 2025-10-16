@@ -1,0 +1,79 @@
+# =====================================
+# Build / Packaging
+# =====================================
+target/
+build/
+out/
+!src/main/**/target/
+!src/test/**/target/
+
+# =====================================
+# IntelliJ IDEA
+# =====================================
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# =====================================
+# Logs
+# =====================================
+*.log
+logs/
+*.out
+
+# =====================================
+# OS-specific files
+# =====================================
+.DS_Store
+Thumbs.db
+
+# =====================================
+# Environment / Secrets
+# =====================================
+.env
+.env.local
+application-local.yml
+application-local.properties
+
+# =====================================
+# Maven
+# =====================================
+.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# =====================================
+# Gradle
+# =====================================
+.gradle/
+build/
+
+# =====================================
+# Spring Boot specific
+# =====================================
+# Embedded server working directory
+.spring-boot-devtools/
+# If using the `spring-boot:run` plugin
+bin/
+
+# =====================================
+# Docker (optionnel si tu utilises Docker)
+# =====================================
+docker-compose.override.yml
+**/docker-data/
+**/postgres-data/
+
+# =====================================
+# Test / coverage
+# =====================================
+/surefire-reports/
+/jacoco.exec
+/jacoco-report/
+coverage/
+test-output/
+
+# =====================================
+# Node (si tu as un front Angular/React dans le repo)
+# =====================================
+node_modules/
+dist/

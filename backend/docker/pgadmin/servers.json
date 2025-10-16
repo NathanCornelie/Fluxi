@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Fluxi Development",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "fluxi_dev",
+      "Username": "fluxi",
+      "Password": "fluxi",
+      "SSLMode": "prefer",
+      "Comment": "Base de données PostgreSQL pour le développement Fluxi"
+    }
+  }
+}
